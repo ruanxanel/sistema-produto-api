@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: sistema-produto-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sistema_produto_db
+    username: postgres
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  server:
+    port: ${PORT}
