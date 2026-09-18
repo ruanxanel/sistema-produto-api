@@ -76,7 +76,6 @@ Representa os dados dos produtos que serão persistidos no banco de dados.
 
 Utilizado para controlar os dados recebidos e enviados pela API.
 
-
 ---
 
 ##  Funcionalidades
@@ -150,16 +149,16 @@ Caso o produto não exista, a API retorna uma exceção de produto não encontra
 
 ```json
 {
-    "nome": "Arroz",
-    "descricao": "Arroz branco",
-    "marca": "União",
-    "categoria": "ALIMENTOS",
-    "preco": 10.50,
-    "estoque": 10,
-    "unidade": "KG",
-    "pesoQtd": 10,
-    "codigoBarras": "1234567891234",
-    "validade": "2027-07-04"
+  "nome": "Arroz",
+  "descricao": "Arroz branco",
+  "marca": "União",
+  "categoria": "ALIMENTOS",
+  "preco": 10.50,
+  "estoque": 10,
+  "unidade": "KG",
+  "pesoQtd": 10,
+  "codigoBarras": "1234567891234",
+  "validade": "2027-07-04"
 }
 ```
 
@@ -208,7 +207,31 @@ Alguns exemplos:
 
 ##  Tratamento de exceções
 
-O projeto possui exceções específicas para situações de negócio.
+A API possui um tratamento global de exceções utilizando:
+
+```text
+@RestControllerAdvice
+```
+
+As exceções são tratadas pelo `GlobalExceptionHandler`, evitando que o Spring retorne respostas muito grandes contendo informações internas da aplicação.
+
+### Exceções implementadas
+
+| Exceção                         | HTTP Status | Situação                       |
+|---------------------------------|:-----------:|--------------------------------|
+| `ProdutoNaoEncontradoException` |     404     | Produto não encontrado         |
+| `ProdutoJaCadastradoException`  |     409     | Código de barras já cadastrado |
+| `EstoqueInvalidoException`      |     400     | Estoque inválido               |
+| `PrecoInvalidoException`        |     400     | Preço inválido                 |
+| `EstoqueInsuficienteException`  |     409     | Estoque insuficiente           |
+
+### Produto não encontrado
+
+Ocorre quando é realizada uma operação utilizando um ID que não existe.
+
+```text
+ProdutoNaoEncontradoException
+```
 
 ### Produto já cadastrado
 
@@ -218,13 +241,48 @@ Ocorre quando é realizada uma tentativa de cadastrar um produto utilizando um c
 ProdutoJaCadastradoException
 ```
 
-### Produto não encontrado
+### Estoque inválido
 
-Ocorre quando é realizada uma operação utilizando um ID que não existe.
+Ocorre quando é informado um valor de estoque inválido (por exemplo, negativo) durante o cadastro ou atualização de um produto.
 
 ```text
-ProdutoNaoEncontradoException
+EstoqueInvalidoException
 ```
+
+### Preço inválido
+
+Ocorre quando é informado um preço inválido (por exemplo, menor ou igual a zero) durante o cadastro ou atualização de um produto.
+
+```text
+PrecoInvalidoException
+```
+
+### Estoque insuficiente
+
+Ocorre quando uma operação tenta reduzir o estoque de um produto além da quantidade disponível.
+
+```text
+EstoqueInsuficienteException
+```
+
+---
+
+##  Padrão de resposta de erro
+
+As respostas de erro seguem um padrão utilizando o `ErrorResponse`.
+
+Exemplo:
+
+```json
+{
+  "status": 404,
+  "erro": "Produto não encontrado",
+  "mensagem": "Produto não encontrado",
+  "timestamp": "2026-09-18T20:00:00"
+}
+```
+
+Isso torna as respostas da API mais organizadas e fáceis de entender.
 
 ---
 
@@ -286,8 +344,6 @@ O objetivo é aplicar na prática os conceitos estudados e construir projetos pa
 
 ##  Próximos passos
 
-- [ ] Implementar GlobalExceptionHandler
-- [ ] Melhorar tratamento de erros
 - [ ] Documentar a API com Swagger
 - [ ] Criar testes automatizados
 - [ ] Adicionar paginação
